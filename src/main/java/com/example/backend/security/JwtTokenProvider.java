@@ -17,11 +17,12 @@ public class JwtTokenProvider {
     private int jwtExpirationInMs;
 
     public String generateToken(Authentication authentication) {
-        org.springframework.security.core.userdetails.User principal =
-                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+
+        com.example.backend.entity.User user =
+                (com.example.backend.entity.User) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setSubject(principal.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpirationInMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
