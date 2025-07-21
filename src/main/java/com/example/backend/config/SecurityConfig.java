@@ -50,21 +50,28 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .antMatchers("/favicon.ico").permitAll()
-                        // 补充放行根路径（自动跳转index.html）
-                        .antMatchers("/").permitAll()
-                        // 放行静态资源（页面+样式+脚本+图片）
-                        .antMatchers("/index.html", "/login.html", "/register.html").permitAll()
-                        .antMatchers("/css/**", "/js/**", "/img/**").permitAll()
-                        // 放行认证接口
-                        .antMatchers("/api/auth/**").permitAll()
-                        // 其他请求需认证
+                        .antMatchers(
+                                "/favicon.ico",                // 根目录的ico文件
+                                "/favicon-*.png",              // 通配符匹配所有favicon-xxx.png（如16x16、32x32）
+                                "/apple-touch-icon.png",       // Apple设备主屏幕图标
+                                "/site.webmanifest"            // PWA清单文件
+                        ).permitAll()
+
+                        .antMatchers(
+                                "/",                          // 根路径（自动跳转index.html）
+                                "/index.html", "/login.html", "/register.html", // 页面
+                                "/css/**", "/js/**", "/img/**"                  // 样式、脚本、图片目录
+                        ).permitAll()
+
+                        .antMatchers("/api/auth/**")     // 所有/auth下的接口（登录、注册）
+                        .permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 无状态会话（依赖JWT）
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT过滤器前置
 
         return http.build();
     }

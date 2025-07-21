@@ -51,19 +51,20 @@ public class AuthController {
 
         try {
             if (userService.existsByUsername(user.getUsername())) {
-                return ResponseEntity.badRequest().body("用户名已存在");
+                return ResponseEntity.badRequest().body(Map.of("message", "用户名已存在"));
             }
             if (userService.existsByEmail(user.getEmail())) {
-                return ResponseEntity.badRequest().body("邮箱已存在");
+                return ResponseEntity.badRequest().body(Map.of("message", "邮箱已存在"));
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole("USER");
             userService.register(user);
-            return ResponseEntity.ok("注册成功");
+            // 修改成功响应为JSON格式
+            return ResponseEntity.ok(Map.of("message", "注册成功"));
 
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("注册失败：" + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("message", "注册失败：" + e.getMessage()));
         }
     }
 

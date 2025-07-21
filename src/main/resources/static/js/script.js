@@ -47,8 +47,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('注册请求失败:', error);
             }
         });
-    } else {
-        // 调试提示：若打印此信息，说明未找到registerForm元素
-        console.error('未找到id为"registerForm"的表单，请检查register.html');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async function(e) { // 修改这一行
+                e.preventDefault();
+
+                const username = document.getElementById('regUsername').value;
+                const password = document.getElementById('regPassword').value;
+                const email = document.getElementById('regEmail').value;
+
+                try {
+
+                    const response = await fetch('http://localhost:8080/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, email })
+                    });
+
+
+                    const contentType = response.headers.get('content-type');
+                    const data = contentType && contentType.includes('application/json')
+                        ? await response.json()
+                        : { message: await response.text() };
+
+                    // 注册成功：执行跳转
+                    if (response.ok) {
+                        alert('注册成功！即将跳转到登录页');
+                        // 强制跳转登录页（核心逻辑）
+                        window.location.href = 'http://localhost:8080/login.html';
+                    } else {
+                        // 注册失败：显示错误
+                        document.getElementById('registerError').textContent = data.message || '注册失败';
+                    }
+                } catch (error) {
+                    document.getElementById('registerError').textContent = '网络错误，请重试';
+                    console.error('注册请求失败:', error);
+                }
+            });
+        } else {
+            console.error('registerForm元素未找到，请检查HTML文件');
+        }
+    });
 });
