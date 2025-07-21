@@ -38,7 +38,7 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // 注册接口（保持不变）
+    // 注册接口
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -67,7 +67,7 @@ public class AuthController {
         }
     }
 
-    // 登录接口（增强异常处理）
+    // 登录接口
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody User loginRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -79,7 +79,7 @@ public class AuthController {
         }
 
         try {
-            // 打印登录请求参数（调试用）
+            // 打印登录请求参数
             System.out.println("登录请求：用户名=" + loginRequest.getUsername());
 
             // 执行认证
@@ -90,7 +90,7 @@ public class AuthController {
                     )
             );
 
-            // 打印认证成功信息（调试用）
+            // 打印认证成功信息
             System.out.println("认证成功：用户=" + authentication.getName());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -111,7 +111,7 @@ public class AuthController {
             System.out.println("认证失败：密码错误");
             return ResponseEntity.badRequest().body("密码错误");
         } catch (ClassCastException e) {
-            // 捕获类型转换异常（关键修复点）
+            // 捕获类型转换异常
             System.out.println("类型转换异常：" + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("认证失败：类型转换错误");
